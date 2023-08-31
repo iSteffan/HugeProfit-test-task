@@ -99,8 +99,7 @@ class Expenses extends Component {
         {isMobile ? this.renderTopMobile() : this.renderTopDesktop()}
         <Box>
           <div className="ex-open-modal-wrapper">
-            {/* Перелік кнопок для переходу на різні маршрути. Не розумію чому кнопки так називаються, 
-            можливо це універсальний компонент який використовується ще десь*/}
+            {/* Перелік кнопок для переходу на різні маршрути*/}
             <OpenModalButton
               size={size_button}
               link="/transactions/move-funds"

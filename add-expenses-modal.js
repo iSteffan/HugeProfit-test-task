@@ -109,6 +109,27 @@ class AddExpensesModal extends Component {
     });
   }
 
+  // Код для оновлення стану
+  componentDidUpdate(prevProps) {
+    if (prevProps.data !== this.props.data) {
+      const { data } = this.props;
+
+      // Оновіть стейт у відповідності до нових пропсів data
+      this.setState({
+        comment: {
+          value: data.comment || '',
+          error: '',
+        },
+        amount: {
+          value: data.amount || '',
+          error: '',
+        },
+        // Оновіть інші необхідні поля стану
+        // ...
+      });
+    }
+  }
+
   // викликаємо функції при розмонтовуванні компонента
   componentWillUnmount() {
     if (typeof this.listenAddFaild == 'function') {
@@ -121,6 +142,8 @@ class AddExpensesModal extends Component {
 
   // сабміт форми
   submit() {
+    const { id } = this.props.data;
+
     // якщо немає аккаунту чи account.value === 0 записуємо повідомлення в стейт
     if (!this.state.account || this.state.account.value === 0) {
       this.setState({
@@ -170,6 +193,52 @@ class AddExpensesModal extends Component {
       inventory_id
     );
     trackEvent('users', 'working', 'add-expenses');
+  }
+  submit() {
+    if (!this.state.account || this.state.account.value === 0) {
+      this.setState({
+        message: {
+          msg: T('not all fields required'),
+        },
+      });
+
+      return false;
+    }
+
+    const { id } = this.props.data;
+    const { account, comment, types, category, shipment, date, amount } = this.state;
+
+    // видаляємо пробіли в коментарях та перевіряємо їх наявність - записуємо повідомлення в стейт
+    if (comment.trim() === '' || amount <= 0) {
+      this.setState({
+        message: {
+          msg: T('not all fields required'),
+        },
+      });
+
+      return false;
+    }
+
+    let inventory_id = 0;
+    if (this.props.inventory_id) {
+      inventory_id = this.props.inventory_id;
+    }
+
+    // передаємо дані в глобальний стан (використовується певна бібліотека управління станом)
+    ExpensesActions.updateExpenses(
+      id,
+      account.value,
+      amount.value,
+      comment.value,
+      types.value,
+      category.value,
+      shipment ? shipment.value : 0,
+      date,
+      inventory_id
+    );
+
+    this.setState({ waiting: true });
+    trackEvent('users', 'working', 'update-expenses');
   }
 
   onChange(evt) {
@@ -328,7 +397,7 @@ class AddExpensesModal extends Component {
           {/* кнопка сабміта */}
           <Button.Group>
             <SubmitButton
-              text="add-expenses-btn"
+              text={this.props.data.id ? 'edit-expenses-btn' : 'add-expenses-btn'}
               waiting={this.state.waiting}
               submit={this.submit}
             />

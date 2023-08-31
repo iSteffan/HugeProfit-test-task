@@ -25,8 +25,8 @@ import Button from 'react-bulma-components/lib/components/button';
 import { Link } from 'react-router-dom';
 
 // додано для модалки
-import OpenInsideModal from 'components/modal/open-inside-modal';
 import AddExpensesModal from 'modules/expenses/add-expenses-modal';
+import AppStore from 'app-store';
 
 class ReportsRow extends Component {
   constructor(props) {
@@ -64,6 +64,12 @@ class ReportsRow extends Component {
     }
 
     return name;
+  }
+
+  // Мій код для відкриття модалки з редагуванням
+  editExpenses(_id) {
+    const data = ExpensesStore.getExpensesById(_id);
+    AppStore.openModal(<AddExpensesModal data={data} />);
   }
 
   // рендер для мобілок рядка таблиці з одною клітинкою
@@ -136,17 +142,17 @@ class ReportsRow extends Component {
                   <FontAwesomeIcon icon="trash-alt" size="2x" title={T('delete')} />
                 </Button>
               </Level.Item>
-              {/* <Level.Item> */}
-              {/* кнопка редагування витрат, з іконкою */}
-              {/* <Button
+              <Level.Item>
+                {/* кнопка редагування витрат, з іконкою */}
+                <Button
                   size="small"
                   rounded
                   color="light"
                   onClick={() => this.editExpenses(data['id'])}
                 >
-                  <FontAwesomeIcon icon="trash-alt" size="2x" title={T('delete')} />
+                  <FontAwesomeIcon icon="edit" size="2x" title={T('edit')} />
                 </Button>
-              </Level.Item> */}
+              </Level.Item>
             </Level.Side>
           </Level>
         </td>
@@ -172,6 +178,12 @@ class ReportsRow extends Component {
         <td>
           <Link to="#" onClick={() => this.deleteExpenses(data['id'])} title={T('delete')}>
             <FontAwesomeIcon icon="trash-alt" size="1x" />
+          </Link>
+        </td>
+        {/* Моя кнопка редагування витрат */}
+        <td>
+          <Link to="#" onClick={() => this.editExpenses(data['id'])} title={T('edit')}>
+            <FontAwesomeIcon icon="edit" size="1x" />
           </Link>
         </td>
       </tr>
